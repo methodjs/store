@@ -1,10 +1,10 @@
 {
   "name": "@methodjs/store",
-  "version": "0.9.1",
+  "version": "0.9.4",
   "description": "Store for React Functional Componets",
-  "main": "lib/restoa.js",
-  "unpkg": "dist/restoa.js",
-  "module": "es/restoa.js",
+  "main": "lib/store.js",
+  "unpkg": "dist/store.js",
+  "module": "es/store.js",
   "types": "types/index.d.ts",
   "scripts": {
     "clean": "rimraf lib dist es js types",

@@ -7,7 +7,7 @@ const DefaultConfig = [
   {
     input: 'js/index.js',
     output: {
-      file: 'lib/restoa.js',
+      file: 'lib/store.js',
       format: 'cjs',
       exports: 'named',
     },
@@ -18,7 +18,7 @@ const DefaultConfig = [
   {
     input: 'js/index.js',
     output: {
-      file: 'es/restoa.js',
+      file: 'es/store.js',
       format: 'es',
       exports: 'named',
     },
@@ -29,7 +29,7 @@ const DefaultConfig = [
   {
     input: 'js/index.js',
     output: {
-      file: 'es/restoa.mjs',
+      file: 'es/store.mjs',
       format: 'es',
       exports: 'named',
     },
@@ -40,9 +40,9 @@ const DefaultConfig = [
   {
     input: 'js/index.js',
     output: {
-      file: 'dist/restoa.js',
+      file: 'dist/store.js',
       format: 'umd',
-      name: 'Restoa',
+      name: 'Store',
       exports: 'named',
       globals: {
         react: 'React',

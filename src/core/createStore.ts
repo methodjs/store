@@ -122,7 +122,7 @@ export function createStore<T, U = T>(
     return unsubscribe;
   }
 
-  function useValue(id: string = `Hook-${Date.now()}`) {
+  function useValue() {
     const [state, setState] = useState<T>(getValue);
 
     useEffect(() => {
@@ -135,15 +135,16 @@ export function createStore<T, U = T>(
     }, []);
 
     useEffect(() => {
+      const id = `Hook-${Date.now()}`;
       activatedHookIdSet.add(id);
-      updateInformation({ activated: true });
+      updateInformation({ activated: true, payload: null });
       return () => {
         activatedHookIdSet.delete(id);
         if (activatedHookIdSet.size === 0) {
-          updateInformation({ activated: false });
+          updateInformation({ activated: false, payload: null });
         }
       };
-    }, [id]);
+    }, []);
 
     return state;
   }
