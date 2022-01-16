@@ -1,18 +1,7 @@
-import {
-  SetValueCallback,
-  BehaviorTest,
-  StartBehavior,
-  StopBehavior,
-  Behavior,
-  createBehavior,
-} from './core/createBehavior';
+import { createBehavior } from './core/createBehavior';
 import { createStore } from './core/createStore';
-import {
-  createQuery,
-  Query,
-  createAsyncQuery,
-  AsyncQuery,
-} from './core/createQuery';
+import { createQuery, createAsyncQuery } from './core/createQuery';
+import { createDevToolsBehavior } from './behaviors/createDevToolsBehavior';
 import {
   GetValue,
   LazyIntializedValue,
@@ -21,6 +10,13 @@ import {
   UseValue,
   CreateStoreOption,
   CreateStoreOptionWithMapper,
+  SetValueCallback,
+  BehaviorTest,
+  StartBehavior,
+  StopBehavior,
+  Behavior,
+  Query,
+  AsyncQuery,
 } from './core/types';
 
 export {
@@ -28,6 +24,7 @@ export {
   createBehavior,
   createQuery,
   createAsyncQuery,
+  createDevToolsBehavior,
   CreateStoreOption,
   CreateStoreOptionWithMapper,
   SetValueCallback,

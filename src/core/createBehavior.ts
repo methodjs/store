@@ -1,37 +1,13 @@
-import { Information, UpdateInformation } from './types';
-
-export interface BehaviorTest {
-  (key: string): boolean;
-}
-
-export interface StartBehavior {
-  (): void;
-}
-
-export interface StopBehavior {
-  (): void;
-}
-
-export interface SetValueCallback<T> {
-  (value: T, key: string): void;
-}
-
-export interface Behavior {
-  setValueCallback?: SetValueCallback<any>;
-  updateInformation?: UpdateInformation<any>;
-}
-
-export interface GetBehavior<T> {
-  (key: string): {
-    setValueCallback: SetValueCallback<T>;
-    updateInformation: UpdateInformation<any>;
-  };
-}
-
-export interface BehaviorWithTest<T> {
-  test: BehaviorTest;
-  behavior: T;
-}
+import {
+  Behavior,
+  BehaviorTest,
+  BehaviorWithTest,
+  Information,
+  SetValueCallback,
+  StartBehavior,
+  StopBehavior,
+  UpdateInformation,
+} from './types';
 
 function createSetValueCallback<T>(
   key: string,

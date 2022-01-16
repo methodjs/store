@@ -91,3 +91,11 @@ export interface BehaviorWithTest<T> {
   test: BehaviorTest;
   behavior: T;
 }
+
+export interface Query<T> {
+  (): T;
+}
+
+export interface AsyncQuery<T> {
+  (): Promise<T>;
+}

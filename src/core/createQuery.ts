@@ -1,14 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createBehavior, UseValue } from '..';
-import { OnValue } from './types';
-
-export interface Query<T> {
-  (): T;
-}
-
-export interface AsyncQuery<T> {
-  (): Promise<T>;
-}
+import { AsyncQuery, OnValue, Query } from './types';
 
 export function createQuery<T>(query: Query<T>, keys: string[]): UseValue<T> {
   const onValueSet: Set<OnValue> = new Set();
