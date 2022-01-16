@@ -1,43 +1,41 @@
 import {
-  GetValueHook,
   SetValueCallback,
-  SetValueHook,
   BehaviorTest,
   StartBehavior,
   StopBehavior,
   Behavior,
   createBehavior,
 } from './core/createBehavior';
-import {
-  createStore,
-  SetValueAction,
-  LazyIntializedValue,
-  UseValue,
-  SetValue,
-  GetValue,
-  Option,
-} from './core/createStore';
+import { createStore } from './core/createStore';
 import {
   createQuery,
   Query,
   createAsyncQuery,
   AsyncQuery,
 } from './core/createQuery';
+import {
+  GetValue,
+  LazyIntializedValue,
+  SetValue,
+  SetValueAction,
+  UseValue,
+  CreateStoreOption,
+  CreateStoreOptionWithMapper,
+} from './core/types';
 
 export {
   createStore,
   createBehavior,
   createQuery,
   createAsyncQuery,
-  GetValueHook,
-  SetValueHook,
+  CreateStoreOption,
+  CreateStoreOptionWithMapper,
   SetValueCallback,
   SetValueAction,
   LazyIntializedValue,
   UseValue,
   SetValue,
   GetValue,
-  Option,
   BehaviorTest,
   StartBehavior,
   StopBehavior,

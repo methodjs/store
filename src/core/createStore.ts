@@ -1,46 +1,47 @@
 import { useEffect, useState } from 'react';
+import { getBehavior } from './createBehavior';
 import {
-  getBehavior,
-  GetValueHook,
-  SetValueCallback,
-  SetValueHook,
-} from './createBehavior';
+  CreateStoreOption,
+  CreateStoreOptionWithMapper,
+  GetValue,
+  Information,
+  LazyIntializedValue,
+  MapperPayload,
+  OnValue,
+  SetValue,
+  SetValueAction,
+  SetValueWithMapper,
+  SetValueWithMapperAction,
+  UseValue,
+} from './types';
 
-export interface OnValue {
-  (): void;
-}
-
-export interface Option<T> {
-  key?: string;
-  getValueHook?: GetValueHook<T>;
-  setValueHook?: SetValueHook<T>;
-  setValueCallback?: SetValueCallback<T>;
-}
-
-export interface UseValue<T> {
-  (): T;
-}
-
-export interface SetValueAction<T> {
-  (currentValue: T): T;
-}
-
-export interface SetValue<T> {
-  (next: T | SetValueAction<T>): void;
-}
-
-export interface GetValue<T> {
-  (): T;
-}
-
-export interface LazyIntializedValue<T> {
-  (): T;
-}
+const INITIALIZE = 'INITIALIZE';
 
 function isSetValueAction<T>(
   next: T | SetValueAction<T>,
 ): next is SetValueAction<T> {
   if (typeof next === 'function') {
+    return true;
+  }
+  return false;
+}
+
+function isSetValueWithMapperAction<T, U>(
+  next: U | SetValueWithMapperAction<T, U>,
+): next is SetValueWithMapperAction<T, U> {
+  if (typeof next === 'function') {
+    return true;
+  }
+  return false;
+}
+
+function isCreateStoreOptionWithMapper<T, U>(
+  option?: CreateStoreOption | CreateStoreOptionWithMapper<T, U>,
+): option is CreateStoreOptionWithMapper<T, U> {
+  if (
+    option !== undefined &&
+    (option as CreateStoreOptionWithMapper<T, U>).mapper !== undefined
+  ) {
     return true;
   }
   return false;
@@ -57,9 +58,33 @@ function isLazyIntializedValue<T>(
 
 export function createStore<T>(
   initialValue: T | LazyIntializedValue<T>,
-  option?: Option<T>,
-): [UseValue<T>, SetValue<T>, GetValue<T>] {
-  function getIntializedValue() {
+  option?: CreateStoreOption,
+): [UseValue<T>, SetValue<T>, GetValue<T>];
+
+export function createStore<T, U = T>(
+  initialValue: T | LazyIntializedValue<T>,
+  option: CreateStoreOptionWithMapper<T, U>,
+): [UseValue<T>, SetValueWithMapper<T, U>, GetValue<T>];
+
+export function createStore<T, U = T>(
+  initialValue: T | LazyIntializedValue<T>,
+  option?: CreateStoreOption | CreateStoreOptionWithMapper<T, U>,
+):
+  | [UseValue<T>, SetValue<T>, GetValue<T>]
+  | [UseValue<T>, SetValueWithMapper<T, U>, GetValue<T>] {
+  let current: T | undefined;
+  const key = option?.key || `store-${Math.random()}`;
+  const onValueSet: Set<OnValue> = new Set();
+  const activatedHookIdSet: Set<string> = new Set();
+  let information: Information = {
+    key,
+    transactionId: 0,
+    activated: false,
+    updated: null,
+    payload: null,
+  };
+
+  function getIntializedValue(): T {
     if (isLazyIntializedValue(initialValue)) {
       return initialValue();
     } else {
@@ -67,47 +92,25 @@ export function createStore<T>(
     }
   }
 
-  const key = option?.key || `store-${Math.random()}`;
-  const getValueHook = option?.getValueHook;
-  const setValueHook = option?.setValueHook;
-  let value: T | undefined;
+  function updateInformation(next: Partial<Information>) {
+    information = { ...information, ...next };
+    const behavior = getBehavior(key);
+    behavior.updateInformation(information, getValue());
+  }
 
-  const onValueSet: Set<OnValue> = new Set();
-
-  function setValue(next?: T | SetValueAction<T>) {
-    const behavior = getBehavior<T>(key);
-    if (next === undefined) {
-      value = undefined;
-      onValueSet.forEach(onValue => onValue());
+  const getValue: GetValue<T> = function getValue() {
+    if (current === undefined) {
+      current = getIntializedValue();
+      updateInformation({
+        transactionId: information.transactionId + 1,
+        updated: new Date(),
+        payload: { action: INITIALIZE },
+      });
+      return current;
     } else {
-      let nextValue = value;
-      if (isSetValueAction(next)) {
-        nextValue = next(value || getIntializedValue());
-      } else {
-        nextValue = next;
-      }
-      nextValue = behavior.setValueHook(nextValue);
-      if (setValueHook !== undefined) {
-        nextValue = setValueHook(nextValue, key);
-      }
-      value = nextValue;
-      onValueSet.forEach(onValue => onValue());
+      return current;
     }
-    if (option?.setValueCallback !== undefined) {
-      option.setValueCallback(value || getIntializedValue(), key);
-    }
-    behavior.setValueCallback(value || getIntializedValue());
-  }
-
-  function getValue() {
-    const behavior = getBehavior<T>(key);
-    let nextValue = value || getIntializedValue();
-    nextValue = behavior.getValueHook(nextValue);
-    if (getValueHook !== undefined) {
-      nextValue = getValueHook(nextValue, key);
-    }
-    return nextValue;
-  }
+  };
 
   function subscribe(onValue: OnValue) {
     onValueSet.add(onValue);
@@ -119,8 +122,8 @@ export function createStore<T>(
     return unsubscribe;
   }
 
-  function useValue() {
-    const [state, setState] = useState<T>(value || getIntializedValue());
+  function useValue(id: string = `Hook-${Date.now()}`) {
+    const [state, setState] = useState<T>(getValue);
 
     useEffect(() => {
       function onValue() {
@@ -131,8 +134,59 @@ export function createStore<T>(
       return unsubscribe;
     }, []);
 
+    useEffect(() => {
+      activatedHookIdSet.add(id);
+      updateInformation({ activated: true });
+      return () => {
+        activatedHookIdSet.delete(id);
+        if (activatedHookIdSet.size === 0) {
+          updateInformation({ activated: false });
+        }
+      };
+    }, [id]);
+
     return state;
   }
 
-  return [useValue, setValue, getValue];
+  function setValueCallback(payload?: MapperPayload) {
+    onValueSet.forEach(onValue => onValue());
+    updateInformation({
+      transactionId: information.transactionId + 1,
+      updated: new Date(),
+      payload: payload || null,
+    });
+    const behavior = getBehavior(key);
+    behavior.setValueCallback(getValue());
+  }
+
+  if (isCreateStoreOptionWithMapper(option)) {
+    const mapper = option.mapper;
+    const setValue: SetValueWithMapper<T, U> = function setValue(
+      next: U | SetValueWithMapperAction<T, U>,
+      payload?: MapperPayload,
+    ) {
+      const pre = getValue();
+      if (isSetValueWithMapperAction(next)) {
+        current = mapper(next(pre), pre, payload);
+      } else {
+        current = mapper(next, pre, payload);
+      }
+      setValueCallback(payload);
+    };
+    return [useValue, setValue, getValue];
+  } else {
+    const setValue: SetValue<T> = function setValue(
+      next: T | SetValueAction<T>,
+      payload?: MapperPayload,
+    ) {
+      if (isSetValueAction(next)) {
+        current = next(getValue());
+      } else {
+        current = next;
+      }
+      setValueCallback(payload);
+    };
+
+    return [useValue, setValue, getValue];
+  }
 }

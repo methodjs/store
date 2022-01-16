@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createBehavior, UseValue } from '..';
-import { OnValue } from './createStore';
+import { OnValue } from './types';
 
 export interface Query<T> {
   (): T;
