@@ -1,6 +1,6 @@
 {
   "name": "@methodjs/store",
-  "version": "0.9.4",
+  "version": "0.9.6",
   "description": "Store for React Functional Componets",
   "main": "lib/store.js",
   "unpkg": "dist/store.js",

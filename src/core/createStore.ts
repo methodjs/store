@@ -130,6 +130,8 @@ export function createStore<T, U = T>(
         const nextState = getValue();
         setState(nextState);
       }
+      // Hook 가 mount 되는 동안, 변경된 값으로 갱신한다.
+      onValue();
       const unsubscribe = subscribe(onValue);
       return unsubscribe;
     }, []);
@@ -137,11 +139,11 @@ export function createStore<T, U = T>(
     useEffect(() => {
       const id = `Hook-${Date.now()}`;
       activatedHookIdSet.add(id);
-      updateInformation({ activated: true, payload: null });
+      updateInformation({ activated: true });
       return () => {
         activatedHookIdSet.delete(id);
         if (activatedHookIdSet.size === 0) {
-          updateInformation({ activated: false, payload: null });
+          updateInformation({ activated: false });
         }
       };
     }, []);
