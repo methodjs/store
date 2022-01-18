@@ -159,7 +159,7 @@ export function createStore<T, U = T>(
       payload: payload || null,
     });
     const behavior = getBehavior(key);
-    behavior.setValueCallback(getValue());
+    behavior.setValueCallback(getValue(), payload);
   }
 
   if (isCreateStoreOptionWithMapper(option)) {

@@ -3,6 +3,7 @@ import {
   BehaviorTest,
   BehaviorWithTest,
   Information,
+  MapperPayload,
   SetValueCallback,
   StartBehavior,
   StopBehavior,
@@ -13,10 +14,10 @@ function createSetValueCallback<T>(
   key: string,
   setValueCallbackArray: BehaviorWithTest<SetValueCallback<any>>[],
 ) {
-  return (value: T) => {
+  return (value: T, payload?: MapperPayload) => {
     setValueCallbackArray.forEach(({ test, behavior }) => {
       if (test(key)) {
-        behavior(value, key);
+        behavior(value, key, payload);
       }
     });
   };
