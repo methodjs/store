@@ -68,7 +68,7 @@ export interface StopBehavior {
 }
 
 export interface SetValueCallback<T> {
-  (value: T, key: string, payload?: MapperPayload): void;
+  (next: T, key: string, prev: T, payload?: MapperPayload): void;
 }
 
 export interface UpdateInformation<T> {

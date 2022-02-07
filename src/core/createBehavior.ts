@@ -14,10 +14,10 @@ function createSetValueCallback<T>(
   key: string,
   setValueCallbackArray: BehaviorWithTest<SetValueCallback<any>>[],
 ) {
-  return (value: T, payload?: MapperPayload) => {
+  return (next: T, prev: T, payload?: MapperPayload) => {
     setValueCallbackArray.forEach(({ test, behavior }) => {
       if (test(key)) {
-        behavior(value, key, payload);
+        behavior(next, key, prev, payload);
       }
     });
   };

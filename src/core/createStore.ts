@@ -94,7 +94,7 @@ export function createStore<T, U = T>(
 
   function updateInformation(next: Partial<Information>) {
     information = { ...information, ...next };
-    const behavior = getBehavior(key);
+    const behavior = getBehavior<T>(key);
     behavior.updateInformation(information, getValue());
   }
 
@@ -151,15 +151,15 @@ export function createStore<T, U = T>(
     return state;
   }
 
-  function setValueCallback(payload?: MapperPayload) {
+  function setValueCallback(prev: T, payload?: MapperPayload) {
     onValueSet.forEach(onValue => onValue());
     updateInformation({
       transactionId: information.transactionId + 1,
       updated: new Date(),
       payload: payload || null,
     });
-    const behavior = getBehavior(key);
-    behavior.setValueCallback(getValue(), payload);
+    const behavior = getBehavior<T>(key);
+    behavior.setValueCallback(getValue(), prev, payload);
   }
 
   if (isCreateStoreOptionWithMapper(option)) {
@@ -174,7 +174,7 @@ export function createStore<T, U = T>(
       } else {
         current = mapper(next, pre, payload);
       }
-      setValueCallback(payload);
+      setValueCallback(pre, payload);
     };
     return [useValue, setValue, getValue];
   } else {
@@ -182,12 +182,13 @@ export function createStore<T, U = T>(
       next: T | SetValueAction<T>,
       payload?: MapperPayload,
     ) {
+      const pre = getValue();
       if (isSetValueAction(next)) {
         current = next(getValue());
       } else {
         current = next;
       }
-      setValueCallback(payload);
+      setValueCallback(pre, payload);
     };
 
     return [useValue, setValue, getValue];
