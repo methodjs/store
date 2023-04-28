@@ -1,6 +1,6 @@
 {
   "name": "@methodjs/store",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "description": "Store for React Functional Componets",
   "main": "lib/store.js",
   "unpkg": "dist/store.js",
@@ -97,7 +97,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@types/jest": "^26.0.24",
-    "@types/react": "^17.0.14",
+    "@types/react": "^17.0.58",
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
     "babel-jest": "^27.0.6",
@@ -107,10 +107,11 @@
     "eslint-plugin-prettier": "^3.4.0",
     "jest": "^27.0.6",
     "prettier": "^2.3.2",
+    "react": ">=16.8.0",
     "react-test-renderer": "^17.0.2",
     "rimraf": "^3.0.2",
     "rollup": "^2.53.2",
-    "react": ">=16.8.0",
+    "tslib": "^2.5.0",
     "typescript": "^4.5.4"
   }
 }
