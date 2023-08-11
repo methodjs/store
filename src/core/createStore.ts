@@ -92,20 +92,23 @@ export function createStore<T, U = T>(
     }
   }
 
-  function updateInformation(next: Partial<Information>) {
+  function updateInformation(next: Partial<Information>, value: T) {
     information = { ...information, ...next };
     const behavior = getBehavior(key);
-    behavior.updateInformation(information, getValue());
+    behavior.updateInformation(information, value);
   }
 
   const getValue: GetValue<T> = function getValue() {
     if (current === undefined) {
       current = getIntializedValue();
-      updateInformation({
-        transactionId: information.transactionId + 1,
-        updated: new Date(),
-        payload: { action: INITIALIZE },
-      });
+      updateInformation(
+        {
+          transactionId: information.transactionId + 1,
+          updated: new Date(),
+          payload: { action: INITIALIZE },
+        },
+        current,
+      );
       return current;
     } else {
       return current;
@@ -139,11 +142,11 @@ export function createStore<T, U = T>(
     useEffect(() => {
       const id = `Hook-${Date.now()}`;
       activatedHookIdSet.add(id);
-      updateInformation({ activated: true });
+      updateInformation({ activated: true }, getValue());
       return () => {
         activatedHookIdSet.delete(id);
         if (activatedHookIdSet.size === 0) {
-          updateInformation({ activated: false });
+          updateInformation({ activated: false }, getValue());
         }
       };
     }, []);
@@ -153,11 +156,14 @@ export function createStore<T, U = T>(
 
   function setValueCallback(payload?: MapperPayload) {
     onValueSet.forEach(onValue => onValue());
-    updateInformation({
-      transactionId: information.transactionId + 1,
-      updated: new Date(),
-      payload: payload || null,
-    });
+    updateInformation(
+      {
+        transactionId: information.transactionId + 1,
+        updated: new Date(),
+        payload: payload || null,
+      },
+      getValue(),
+    );
     const behavior = getBehavior(key);
     behavior.setValueCallback(getValue(), payload);
   }
